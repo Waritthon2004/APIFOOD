@@ -38,8 +38,8 @@ router.put("/",async (req, res) => {
       pointA = image.point1 + 32 * (0 - a);
       pointB = image.point2 + 32 * (1 - b);
 
-      str1 = image.point1+" 32 * (0 - "+a+")";
-      str2 = image.point2+" 32 * (1 - "+b+")";
+      str1 = image.point1+"+32 * (0 - "+a+")";
+      str2 = image.point2+"+ 32 * (1 - "+b+")";
   }
 
   if(pointA <=0){
@@ -120,7 +120,7 @@ console.log(sql2);
         ra : a,
         rb : b,
         sum1 :str1,
-        sum2 : sql2,
+        sum2 : str2,
         newA : pointA,
         newB : pointB,
         point1: image.point1,
