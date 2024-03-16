@@ -69,6 +69,8 @@ router.post("/",fileupload.diskLoader.single("file"),async(req,res)=>{
         last_idx: result.insertId,
       });
       const currentDate =  getCurrentDate();
+      console.log(currentDate);
+      
       let check2: any = await new Promise((resolve, reject) => {
         conn.query("INSERT INTO `Statics`(`PID`, `Date`, `point`) VALUES (?,?,?)",[result.insertId, currentDate,0], (err, result) => {
           if (err) reject(err);
