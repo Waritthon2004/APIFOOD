@@ -68,7 +68,7 @@ router.post("/",fileupload.diskLoader.single("file"),async(req,res)=>{
         affected_row: result.affectedRows,
         last_idx: result.insertId,
       });
-      const currentDate = new Date().toISOString().slice(0, 10);
+      const currentDate =  getCurrentDate();
       let check2: any = await new Promise((resolve, reject) => {
         conn.query("INSERT INTO `Statics`(`PID`, `Date`, `point`) VALUES (?,?,?)",[result.insertId, currentDate,0], (err, result) => {
           if (err) reject(err);
@@ -86,7 +86,14 @@ router.post("/",fileupload.diskLoader.single("file"),async(req,res)=>{
 });
 
 
-
+function getCurrentDate(): string {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
+  const day = date.getDate().toString().padStart(2, '0');
+  
+  return `${year}-${month}-${day}`;
+}
 
 // router.post("/image",fileupload.diskLoader.single("file"),async(req,res)=>{
 //   //Upload to firebase storage

@@ -50,7 +50,7 @@ router.put("/",async (req, res) => {
   if(pointB <=0){
     pointB = 0;
   }
-  const currentDate = new Date().toISOString().slice(0, 10);
+  const currentDate = getCurrentDate();
   console.log(currentDate);
   
   
@@ -138,8 +138,7 @@ console.log(sql2);
     // const datepipe: DatePipe = new DatePipe('en-US')
     // let formattedDate = datepipe.transform(new Date(), 'YYYY-MM-dd')
     // console.log(formattedDate);
-    const date = getCurrentDate();
-console.log(date);
+
 });
 
 

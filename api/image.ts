@@ -54,10 +54,10 @@ export const router = express.Router();
                         });
                     })
                 ]);
-                console.log("SQL 1", sql1); 
-                console.log("SQL 2", sql2);
-                console.log("data1", data1);
-                console.log("data2", data2);
+                // console.log("SQL 1", sql1); 
+                // console.log("SQL 2", sql2);
+                // console.log("data1", data1);
+                // console.log("data2", data2);
                  
                 res.status(200).json({
                     pid1: pid1,
@@ -103,7 +103,7 @@ export const router = express.Router();
       if (err) throw err;
       if (result.length > 0) {
         for(let i = 0; i < result.length; i++){
-          const currentDate = new Date().toISOString().slice(0, 10);
+         const currentDate = getCurrentDate();;
           await new Promise((resolve, reject) => {
             conn.query("INSERT INTO `Statics`(`PID`, `Date`, `point`) VALUES (?,?,?)", [result[i].PID, currentDate, result[i].point], (err, result) => {
               if (err) reject(err);
@@ -115,4 +115,11 @@ export const router = express.Router();
       res.status(200).json(result);
     });
   });
-   
+  function getCurrentDate(): string {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
+    const day = date.getDate().toString().padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  }
