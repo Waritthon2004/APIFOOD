@@ -2,16 +2,15 @@ import express from "express";
 import { conn } from "../dbconnet";
 import mysql from "mysql";
 export const router = express.Router();
-router.post("/chart",async (req, res) => {
+router.get("/chart",async (req, res) => {
+  console.log(req.query.id);
   
-  const data = req.body;
-  let sql = "SELECT DISTINCT DATE_FORMAT(Date, '%Y-%m-%d') AS Date, point  FROM Statics  WHERE PID = 102 AND DATEDIFF(Date, CURDATE()) <= 7 ORDER BY Date ASC";
-  conn.query(sql, (err, result) => {
+  let sql = "SELECT DISTINCT DATE_FORMAT(Date, '%Y-%m-%d') AS Date, point  FROM Statics  WHERE PID = ? AND DATEDIFF(Date, CURDATE()) <= 7 ORDER BY Date ASC";
+  conn.query(sql, req.query.id ,(err, result) => {
     if (err) throw err;
     res
       .status(200)
       .json(result);
-    console.log(result);
     
   });
 });
