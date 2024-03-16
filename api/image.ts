@@ -16,7 +16,7 @@ export const router = express.Router();
   //get image by id
   router.get("/all/:id", (req, res) => {
     const id = req.params.id;
-    let sql = "SELECT * FROM Picture,Statics Where Picture.PID = Statics.PID and Picture.UID = ? ORDER BY DATE DESC ";
+    let sql = "SELECT * FROM Picture,Statics Where Picture.PID = Statics.PID and Picture.UID = ? ORDER BY DATE DESC  LIMIT 5 ";
     conn.query(sql,[id], (err, result) => {
       if (err) throw err;
       res

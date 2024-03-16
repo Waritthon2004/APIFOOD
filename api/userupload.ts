@@ -90,12 +90,15 @@ router.post("/",fileupload.diskLoader.single("file"),async(req,res)=>{
 
 function getCurrentDate(): string {
   const date = new Date();
+  const timeZoneOffset = date.getTimezoneOffset() / 60;
+  date.setHours(date.getHours() + timeZoneOffset + 7); // UTC+7 for Bangkok
   const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const day = date.getDate().toString().padStart(2, '0');
   
   return `${year}-${month}-${day}`;
 }
+
 
 // router.post("/image",fileupload.diskLoader.single("file"),async(req,res)=>{
 //   //Upload to firebase storage
