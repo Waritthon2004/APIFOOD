@@ -26,7 +26,7 @@ export const router = express.Router();
   });
 
   router.get("/", async (req, res) => {
-    let sql = "SELECT Picture.* FROM Picture ORDER BY RAND() LIMIT 2";
+    let sql = "SELECT Picture.PID FROM Picture,Statics WHERE Picture.PID = Statics.PID and Statics.Date< ADDTIME(NOW(), '-1:0:0') ORDER BY RAND()  LIMIT 2";
     conn.query(sql, async (err, result) => {
         if (err) throw err;
 
