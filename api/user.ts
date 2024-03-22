@@ -70,7 +70,7 @@ router.post("/page", (req, res) => {
   let x = 0;
   for(let i = 1 ;i<ca.page ;i++){
     x+=5;
-  }
+  } 
   let sql = "SELECT * FROM User ORDER BY UID ASC LIMIT 5 OFFSET ?";
   sql = mysql.format(sql, [
    x
