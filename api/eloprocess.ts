@@ -70,7 +70,7 @@ router.put("/",async (req, res) => {
 
   let sql1 = "";
   let sql2 = "";
-  // console.log(check1,check2);
+   console.log(check1,check2);
   
  
   if(check1.length>0){
