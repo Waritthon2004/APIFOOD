@@ -45,7 +45,28 @@ public readonly diskLoader = multer({
 
 
 router.get("/", (req, res) => {
-  const sql = "Select * from User ";
+  const sql = "Select * from User LIMIT 5";
+  conn.query(sql, async(err, result) => {
+    if (err) {
+      res.status(400).json(err);
+    } else {
+      let check2: any = await new Promise((resolve, reject) => {
+        conn.query("Select count(UID) as COUNT from User ", (err, result) => {
+          if (err) reject(err);
+          resolve(result);
+        });
+      });
+      res.json({
+        data : result,
+        Row : check2[0].COUNT
+      });
+    }
+  });
+});
+
+
+router.get("/next", (req, res) => {
+  const sql = "Select * from User LIMIT 5,5";
   conn.query(sql, (err, result) => {
     if (err) {
       res.status(400).json(err);
