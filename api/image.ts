@@ -75,26 +75,14 @@ router.get("/all/:id", (req, res) => {
 
 router.get("/", async (req, res) => {
   let sql =
-    "SELECT Picture.PID as PID,Picture.url as url,Statics.point as point FROM Picture,Statics WHERE Picture.PID = Statics.PID  and Picture.PID not in(SELECT PID FROM Delay ) ORDER BY RAND(),Statics.Date DESC  LIMIT 2";
+    "DELETE FROM Delay WHERE TIMESTAMPDIFF(SECOND,Time , NOW()) >= 10";
   conn.query(sql, async (err, result) => {
     if (err) throw err;
-
+    
     try {
-      for (let i = 0; i < result.length; i++) {
-        let check: any = await new Promise((resolve, reject) => {
-          conn.query(
-            "INSERT INTO `Delay`(`PID`,`Time`) VALUES (?,NOW())",
-            [result[i].PID],
-            (err, result) => {
-              if (err) reject(err);
-              resolve(result);
-            }
-          );
-        });
-      }
-  
-      let s = "DELETE FROM Delay WHERE TIMESTAMPDIFF(SECOND,Time , NOW()) >= 10";
-      let check2 = await new Promise((resolve, reject) => {
+      let s =
+        "SELECT Picture.PID as PID,Picture.url as url,Statics.point as point FROM Picture,Statics WHERE Picture.PID = Statics.PID  and Picture.PID not in(SELECT PID FROM Delay ) ORDER BY RAND(),Statics.Date DESC  LIMIT 2";
+      let check2 : any = await new Promise((resolve, reject) => {
         conn.query(s, (err, result) => {
           if (err) reject(err);
           resolve(result);
@@ -103,17 +91,42 @@ router.get("/", async (req, res) => {
 
       //console.log(s);
       res.status(200).json({
-        pid1: result[0].PID,
-        image1: result[0].url,
-        point1: result[0].point,
+        pid1: check2[0].PID,
+        image1: check2[0].url,
+        point1: check2[0].point,
 
-        image2: result[1].url,
-        point2: result[1].point,
-        pid2: result[1].PID,
+        image2: check2[1].url,
+        point2: check2[1].point,
+        pid2: check2[1].PID,
       });
     } catch (error) {}
   });
 });
+router.post("/delay", async (req, res) => {
+  let data = req.body;
+
+  
+  if(data.win == 1){
+    let sql =
+    "INSERT INTO `Delay`(`PID`, `Time`) VALUES (?,NOW())";
+  conn.query(sql, [data.PID1], (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
+  }
+  else{
+    let sql =
+    "INSERT INTO `Delay`(`PID`, `Time`) VALUES (?,NOW())";
+  conn.query(sql, [data.PID2], (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
+  }
+ 
+});
+
+
+
 
 router.delete("/:id", (req, res) => {
   const id = req.params.id;

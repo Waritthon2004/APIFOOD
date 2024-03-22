@@ -50,7 +50,7 @@ router.put("/",async (req, res) => {
     pointB = 0;
   }
   const currentDate = getCurrentDate();
-  console.log(currentDate);
+  //console.log(currentDate);
   
   
   
@@ -70,7 +70,7 @@ router.put("/",async (req, res) => {
 
   let sql1 = "";
   let sql2 = "";
-  console.log(check1,check2);
+  // console.log(check1,check2);
   
  
   if(check1.length>0){
@@ -90,8 +90,8 @@ router.put("/",async (req, res) => {
     sql2 = "INSERT INTO `Statics`(`PID`, `Date`, `point`) VALUES (?,?,?)";
     sql2 = mysql.format(sql2, [image.PID2, currentDate,pointB]);
   }
-console.log(sql1);
-console.log(sql2);
+// console.log(sql1);
+// console.log(sql2);
 
 
   Promise.all([
