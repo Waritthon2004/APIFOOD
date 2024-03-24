@@ -130,14 +130,21 @@ router.post("/delay", async (req, res) => {
 
 router.delete("/:id", (req, res) => {
   const id = req.params.id;
-  console.log(id);
+  if (id === "undefined") {
+    return res.status(400).json({ error: "ID is undefined" });
+  }
 
+  console.log(id);
   let sql = "DELETE FROM Picture WHERE PID = ?";
   conn.query(sql, [id], (err, result) => {
     if (err) throw err;
     else res.json({ affected_row: result.affectedRows });
   });
 });
+
+
+
+
 
 router.get("/date/:day", (req, res) => {
   const day = req.params.day;
@@ -148,8 +155,6 @@ router.get("/date/:day", (req, res) => {
     res.json(result);
   });
 });
-
-
 
 
 router.get("/newday", (req, res) => {
