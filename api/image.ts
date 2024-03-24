@@ -148,29 +148,47 @@ router.get("/date/:day", (req, res) => {
   });
 });
 
+
+
+
 router.get("/newday", (req, res) => {
   let sql =
-    "SELECT DISTINCT PID, point FROM Statics Where DATEDIFF(CURDATE(), Date) = 1";
-  conn.query(sql, async (err, result) => {
+  "SELECT DISTINCT PID, point FROM Statics Where DATEDIFF(CURDATE(), Date) = 0";
+  conn.query(sql, (err, result) => {
     if (err) throw err;
-    if (result.length > 0) {
-      for (let i = 0; i < result.length; i++) {
-        const currentDate = getCurrentDate();
-        await new Promise((resolve, reject) => {
-          conn.query(
-            "INSERT INTO `Statics`(`PID`, `Date`, `point`) VALUES (?,?,?)",
-            [result[i].PID, currentDate, result[i].point],
-            (err, result) => {
-              if (err) reject(err);
-              resolve(result);
-            }
-          );
-        });
+
+    if(result.length >0){
+      sql =
+      "SELECT DISTINCT PID, point FROM Statics Where DATEDIFF(CURDATE(), Date) = 1";
+      new Promise ((resolve, reject) => {
+         conn.query(sql, async (err, result) => {
+      if (err) throw err;
+      if (result.length > 0) {
+        for (let i = 0; i < result.length; i++) {
+          const currentDate = getCurrentDate();
+          await new Promise((resolve, reject) => {
+            conn.query(
+              "INSERT INTO `Statics`(`PID`, `Date`, `point`) VALUES (?,?,?)",
+              [result[i].PID, currentDate, result[i].point],
+              (err, result) => {
+                if (err) reject(err);
+                resolve(result);
+              }
+            );
+          });
+        }
       }
+      resolve(result);
+    });
+    }).then(result => {
+      res.status(200).json(result);
+    }).catch(err => {
+      res.status(500).json({ error: err.message });
+    });
     }
-    res.status(200).json(result);
   });
 });
+
 function getCurrentDate(): string {
   const date = new Date();
   const timeZoneOffset = date.getTimezoneOffset() / 60;
