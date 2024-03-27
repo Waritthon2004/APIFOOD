@@ -83,15 +83,14 @@ router.get("/all/:id", (req, res) => {
 // });
 
 router.get("/", async (req, res) => {
-  let sql =
-    "DELETE FROM Delay WHERE TIMESTAMPDIFF(SECOND,Time , NOW()) >= 10";
+  let sql = "DELETE FROM Delay WHERE TIMESTAMPDIFF(SECOND,Time , NOW()) >= 10";
   conn.query(sql, async (err, result) => {
     if (err) throw err;
-    
+
     try {
       let s =
-        "SELECT Picture.PID as PID,Picture.url as url,Statics.point as point FROM Picture,Statics WHERE Picture.PID = Statics.PID  and Picture.PID not in(SELECT PID FROM Delay ) ORDER BY RAND(),Statics.Date DESC  LIMIT 2";
-      let check2 : any = await new Promise((resolve, reject) => {
+        "SELECT Picture.PID as PID,Picture.url as url,Statics.point as point FROM Picture,Statics WHERE Picture.PID = Statics.PID  and Picture.PID not in(SELECT PID FROM Delay ) and DATEDIFF(CURDATE(), Date) = 0 ORDER BY RAND() LIMIT 2";
+      let check2: any = await new Promise((resolve, reject) => {
         conn.query(s, (err, result) => {
           if (err) reject(err);
           resolve(result);
@@ -114,28 +113,20 @@ router.get("/", async (req, res) => {
 router.post("/delay", async (req, res) => {
   let data = req.body;
 
-  
-  if(data.win == 1){
-    let sql =
-    "INSERT INTO `Delay`(`PID`, `Time`) VALUES (?,NOW())";
-  conn.query(sql, [data.PID1], (err, result) => {
-    if (err) throw err;
-    res.json(result);
-  });
+  if (data.win == 1) {
+    let sql = "INSERT INTO `Delay`(`PID`, `Time`) VALUES (?,NOW())";
+    conn.query(sql, [data.PID1], (err, result) => {
+      if (err) throw err;
+      res.json(result);
+    });
+  } else {
+    let sql = "INSERT INTO `Delay`(`PID`, `Time`) VALUES (?,NOW())";
+    conn.query(sql, [data.PID2], (err, result) => {
+      if (err) throw err;
+      res.json(result);
+    });
   }
-  else{
-    let sql =
-    "INSERT INTO `Delay`(`PID`, `Time`) VALUES (?,NOW())";
-  conn.query(sql, [data.PID2], (err, result) => {
-    if (err) throw err;
-    res.json(result);
-  });
-  }
- 
 });
-
-
-
 
 router.delete("/:id", (req, res) => {
   const id = req.params.id;
@@ -151,16 +142,13 @@ router.delete("/:id", (req, res) => {
   });
 });
 
-
 router.get("/delay", (req, res) => {
-  let sql =
-    "SELECT URL,Time FROM Delay,Picture where Delay.PID = Picture.PID";
+  let sql = "SELECT URL,Time FROM Delay,Picture where Delay.PID = Picture.PID";
   conn.query(sql, (err, result) => {
     if (err) throw err;
     res.json(result);
   });
 });
-
 
 router.get("/date/:day", (req, res) => {
   const day = req.params.day;
@@ -172,43 +160,43 @@ router.get("/date/:day", (req, res) => {
   });
 });
 
-
-router.get("/newday", (req, res) => {
+router.get("/checkday", (req, res) => {
   let sql =
-  "SELECT DISTINCT PID, point FROM Statics Where DATEDIFF(CURDATE(), Date) = 0";
+    "SELECT * FROM Statics WHERE  DATEDIFF(CURDATE(),Date )=0";
   conn.query(sql, (err, result) => {
     if (err) throw err;
 
-    if(result.length >0){
-      sql =
-      "SELECT DISTINCT PID, point FROM Statics Where DATEDIFF(CURDATE(), Date) = 1";
-      new Promise ((resolve, reject) => {
-         conn.query(sql, async (err, result) => {
-      if (err) throw err;
-      if (result.length > 0) {
-        for (let i = 0; i < result.length; i++) {
-          const currentDate = getCurrentDate();
-          await new Promise((resolve, reject) => {
-            conn.query(
-              "INSERT INTO `Statics`(`PID`, `Date`, `point`) VALUES (?,?,?)",
-              [result[i].PID, currentDate, result[i].point],
-              (err, result) => {
-                if (err) reject(err);
-                resolve(result);
-              }
-            );
-          });
-        }
-      }
-      resolve(result);
-    });
-    }).then(result => {
-      res.status(200).json(result);
-    }).catch(err => {
-      res.status(500).json({ error: err.message });
-    });
+    if(result.length == 0){
+      res.json({do : "True"});
     }
+    else{
+      res.json({do : "False"});
+    }
+    
   });
+});
+
+router.get("/newday", (req, res) => {
+      let sql =
+        "SELECT DISTINCT PID, point FROM Statics Where DATEDIFF(CURDATE(), Date) = 1";
+        conn.query(sql, async (err, result) => {
+          if (err) throw err;
+          if (result.length > 0) {
+            for (let i = 0; i < result.length; i++) {
+              const currentDate = getCurrentDate();
+              await new Promise((resolve, reject) => {
+                conn.query(
+                  "INSERT INTO `Statics`(`PID`, `Date`, `point`) VALUES (?,?,?)",
+                  [result[i].PID, currentDate, result[i].point],
+                  (err, result) => {
+                    if (err) reject(err);
+                    resolve(result);
+                  }
+                );
+              });
+            }
+          }
+        });     
 });
 
 function getCurrentDate(): string {
