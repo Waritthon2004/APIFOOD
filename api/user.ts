@@ -45,7 +45,7 @@ public readonly diskLoader = multer({
 
 
 router.get("/", (req, res) => {
-  const sql = "Select * from User LIMIT 5";
+  const sql = "Select * from User where type = 0 LIMIT 5";
   conn.query(sql, async(err, result) => {
     if (err) {
       res.status(400).json(err);
@@ -71,7 +71,7 @@ router.post("/page", (req, res) => {
   for(let i = 1 ;i<ca.page ;i++){
     x+=5;
   } 
-  let sql = "SELECT * FROM User ORDER BY UID ASC LIMIT 5 OFFSET ?";
+  let sql = "SELECT * FROM User Where type = 0 ORDER BY UID ASC LIMIT 5 OFFSET ?";
   sql = mysql.format(sql, [
    x
   ]);
