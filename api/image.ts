@@ -81,25 +81,23 @@ router.get("/all/:id", (req, res) => {
 //         }
 //     });
 // });
-
 router.post("/", async (req, res) => {
   let data = req.body;
-  
-  let sql = "DELETE FROM Delay WHERE TIMESTAMPDIFF(SECOND,Time , NOW()) >= ?";
-  conn.query(sql, [data],async (err, result) => {
+
+  let sql = "DELETE FROM Delay WHERE TIMESTAMPDIFF(SECOND, Time, NOW()) >= ?";
+  conn.query(sql, [data], async (err, result) => {
     if (err) throw err;
 
+    let s =
+      "SELECT Picture.PID as PID,Picture.url as url,Statics.point as point FROM Picture,Statics WHERE Picture.PID = Statics.PID  and Picture.PID not in(SELECT Delay.PID FROM Delay,Picture where Delay.PID = Picture.PID ) and DATEDIFF(CURDATE(), Date) = 0 ORDER BY RAND() LIMIT 2";
     try {
-      let s =
-        "SELECT Picture.PID as PID,Picture.url as url,Statics.point as point FROM Picture,Statics WHERE Picture.PID = Statics.PID  and Picture.PID not in(SELECT PID FROM Delay ) and DATEDIFF(CURDATE(), Date) = 0 ORDER BY RAND() LIMIT 2";
-      let check2: any = await new Promise((resolve, reject) => {
+      let check2 : any= await new Promise((resolve, reject) => {
         conn.query(s, (err, result) => {
           if (err) reject(err);
           resolve(result);
         });
       });
 
-      //console.log(s);
       res.status(200).json({
         pid1: check2[0].PID,
         image1: check2[0].url,
@@ -109,9 +107,14 @@ router.post("/", async (req, res) => {
         point2: check2[1].point,
         pid2: check2[1].PID,
       });
-    } catch (error) {}
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   });
 });
+
+
 router.post("/delay", async (req, res) => {
   let data = req.body;
 
