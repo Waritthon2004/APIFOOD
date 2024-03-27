@@ -152,7 +152,14 @@ router.delete("/:id", (req, res) => {
 });
 
 
-
+router.get("/delay", (req, res) => {
+  let sql =
+    "SELECT URL,Time FROM Delay,Picture where Delay.PID = Picture.PID";
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
+});
 
 
 router.get("/date/:day", (req, res) => {
