@@ -14,8 +14,17 @@ router.get("/all", (req, res) => {
 //get image by id
 router.get("/all/:id", (req, res) => {
   const id = req.params.id;
-  let sql =
-    "SELECT * FROM Picture,Statics Where Picture.PID = Statics.PID and Picture.UID = ? and Date in (SELECT MAX(Date) FROM Statics) ORDER BY DATE DESC LIMIT 5";
+  let sql = `SELECT PID,UID, point, url, ROW_NUMBER() OVER (ORDER BY point DESC) AS "rank" 
+  FROM (
+      SELECT Picture.PID,User.UID, MAX(Statics.point) AS point, MAX(url) AS url 
+      FROM Statics, Picture ,User
+      WHERE Picture.PID = Statics.PID 
+      AND Picture.UID = User.UID
+      AND Statics.Date = (SELECT MAX(Date)FROM Statics) 
+      AND User.UID = ?
+      GROUP BY Picture.PID 
+  ) 
+  AS max_points ORDER BY point DESC `;
   conn.query(sql, [id], (err, result) => {
     if (err) throw err;
     res.status(200).json(result);
