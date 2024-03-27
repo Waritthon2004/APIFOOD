@@ -122,14 +122,16 @@ router.post("/", fileupload.diskLoader.single("file"),async (req, res) => {
   const url = await getDownloadURL(snapshost.ref)
     const password = user.Password;
     user.Password = hashPassword(password);
+    const type = 0;
     let sql =
-      "INSERT INTO `User`(`Firstname`, `Lastname`, `Email`, `Password`,`image`) VALUES (?,?,?,?,?)";
+      "INSERT INTO `User`(`Firstname`, `Lastname`, `Email`, `Password`,`image`, `type`) VALUES (?,?,?,?,?,?)";
     sql = mysql.format(sql, [
       user.Firstname,
       user.Lastname,
       user.Email,
       user.Password,
-      url
+      url,
+      type
     ]);
 
     conn.query(sql, (err, result) => {
@@ -156,14 +158,18 @@ router.post("/", fileupload.diskLoader.single("file"),async (req, res) => {
 router.post("/check", async (req, res) => {
   let user: Loginrespone = req.body;
 
-  let sql = "SELECT UID, Email, Password FROM User WHERE Email = ?";
+  let sql = "SELECT UID, Email, Password,type FROM User WHERE Email = ?";
   sql = mysql.format(sql, [user.Email]);
   conn.query(sql, (err, result) => {
       if (err) throw err;
 
       if (result && result.length > 0) {
           if (comparePassword(user.Password, result[0].Password)) {
-              res.status(201).json({ UID: result[0].UID });
+              res.status(201).json({ 
+                UID: result[0].UID,
+                type:result[0].type
+              
+              });
           } else {
               res.json({ UID: "Password not correct" });
           }
