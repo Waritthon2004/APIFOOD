@@ -82,9 +82,11 @@ router.get("/all/:id", (req, res) => {
 //     });
 // });
 
-router.get("/", async (req, res) => {
-  let sql = "DELETE FROM Delay WHERE TIMESTAMPDIFF(SECOND,Time , NOW()) >= 10";
-  conn.query(sql, async (err, result) => {
+router.post("/", async (req, res) => {
+  let data = req.body;
+  
+  let sql = "DELETE FROM Delay WHERE TIMESTAMPDIFF(SECOND,Time , NOW()) >= ?";
+  conn.query(sql, [data],async (err, result) => {
     if (err) throw err;
 
     try {

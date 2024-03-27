@@ -5,7 +5,7 @@ export const router = express.Router();
 router.get("/chart",async (req, res) => {
   console.log(req.query.id);
   
-  let sql = "SELECT DISTINCT DATE_FORMAT(Date, '%Y-%m-%d') AS Date, point  FROM Statics  WHERE PID = ? AND DATEDIFF(Date, CURDATE()) <= 7 ORDER BY Date ASC";
+  let sql = "SELECT DISTINCT DATE_FORMAT(Date, '%Y-%m-%d') AS Date, point  FROM Statics  WHERE PID = ? AND DATEDIFF(Date, CURDATE()) <= 7 ORDER BY Date ASC LIMIT 7";
   conn.query(sql, req.query.id ,(err, result) => {
     if (err) throw err;
     res
