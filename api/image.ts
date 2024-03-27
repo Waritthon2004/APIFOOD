@@ -85,52 +85,55 @@ router.post("/", async (req, res) => {
   let data = req.body;
 
   let sql = "DELETE FROM Delay WHERE TIMESTAMPDIFF(SECOND, Time, NOW()) >= ?";
-  conn.query(sql, [data], async (err, result) => {
+  sql = mysql.format(sql, [data]);
+  conn.query(sql, async (err, result) => {
     if (err) throw err;
 
-    let s =
-      "SELECT Picture.PID as PID,Picture.url as url,Statics.point as point FROM Picture,Statics WHERE Picture.PID = Statics.PID  and Picture.PID not in(SELECT Delay.PID FROM Delay,Picture where Delay.PID = Picture.PID ) and DATEDIFF(CURDATE(), Date) = 0 ORDER BY RAND() LIMIT 2";
-    try {
-      let check2 : any= await new Promise((resolve, reject) => {
-        conn.query(s, (err, result) => {
-          if (err) reject(err);
-          resolve(result);
-        });
-      });
 
-      res.status(200).json({
-        pid1: check2[0].PID,
-        image1: check2[0].url,
-        point1: check2[0].point,
+  });
+  let check1: any = await new Promise((resolve, reject) => {
+    conn.query("SELECT Picture.PID as PID,Picture.url as url,Statics.point as point FROM Picture,Statics WHERE Picture.PID = Statics.PID  and Picture.PID not in(SELECT Delay.PID FROM Delay,Picture where Delay.PID = Picture.PID ) and DATEDIFF(CURDATE(), Date) = 0 ORDER BY RAND() LIMIT 2", (err, result) => {
+      if (err) reject(err);
+      resolve(result);
+    });
+  });
 
-        image2: check2[1].url,
-        point2: check2[1].point,
-        pid2: check2[1].PID,
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
+  console.log(check1);
+  
+  res.status(200).json({
+    pid1: check1[0].PID,
+    image1: check1[0].url,
+    point1: check1[0].point,
+
+    image2: check1[1].url,
+    point2: check1[1].point,
+    pid2: check1[1].PID,
   });
 });
 
 
 router.post("/delay", async (req, res) => {
+  
   let data = req.body;
 
   if (data.win == 1) {
     let sql = "INSERT INTO `Delay`(`PID`, `Time`) VALUES (?,NOW())";
-    conn.query(sql, [data.PID1], (err, result) => {
+    sql = mysql.format(sql, [data.PID1]);
+    conn.query(sql, (err, result) => {
       if (err) throw err;
       res.json(result);
     });
+    
   } else {
     let sql = "INSERT INTO `Delay`(`PID`, `Time`) VALUES (?,NOW())";
+    sql = mysql.format(sql, [data.PID2]);
     conn.query(sql, [data.PID2], (err, result) => {
       if (err) throw err;
       res.json(result);
     });
   }
+ 
+  
 });
 
 router.delete("/:id", (req, res) => {
