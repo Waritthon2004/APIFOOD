@@ -92,7 +92,7 @@ router.post("/", async (req, res) => {
 
   });
   let check1: any = await new Promise((resolve, reject) => {
-    conn.query("SELECT Picture.PID as PID,Picture.url as url,Statics.point as point FROM Picture,Statics WHERE Picture.PID = Statics.PID  and Picture.PID not in(SELECT Delay.PID FROM Delay,Picture where Delay.PID = Picture.PID ) and DATEDIFF(CURDATE(), Date) = 0 ORDER BY RAND() LIMIT 2", (err, result) => {
+    conn.query("SELECT Picture.PID as PID, Picture.url as url, Statics.point as point  FROM Picture, Statics WHERE Picture.PID = Statics.PID AND DATEDIFF(CURDATE(), Date) = 0  AND Picture.PID NOT IN (SELECT PID FROM Delay)  ORDER BY RAND()  LIMIT 2 ", (err, result) => {
       if (err) reject(err);
       resolve(result);
     });
@@ -150,12 +150,28 @@ router.delete("/:id", (req, res) => {
   });
 });
 
-router.get("/delay", (req, res) => {
-  let sql = "SELECT URL,Time FROM Delay,Picture where Delay.PID = Picture.PID";
-  conn.query(sql, (err, result) => {
+router.post("/delayshow",async (req, res) => {
+ 
+  
+  console.log(req.body);
+  
+  let data = req.body;
+  let sql = "DELETE FROM Delay WHERE TIMESTAMPDIFF(SECOND, Time, NOW()) >= ?";
+  sql = mysql.format(sql, [data]);
+  console.log(sql);
+  
+  conn.query(sql,  (err, result) => {
     if (err) throw err;
-    res.json(result);
+
   });
+  let check1: any = await new Promise((resolve, reject) => {
+    conn.query("SELECT URL,TIMESTAMPDIFF(SECOND, Time, Now()) AS time_diff_seconds FROM Delay,Picture where Delay.PID = Picture.PID  ORDER by time_diff_seconds DESC", (err, result) => {
+      if (err) reject(err);
+      resolve(result);
+    });
+  });
+  res.json(check1);
+
 });
 
 router.get("/date/:day", (req, res) => {
@@ -206,6 +222,9 @@ router.get("/newday", (req, res) => {
           }
         });     
 });
+
+
+
 
 function getCurrentDate(): string {
   const date = new Date();
