@@ -24,7 +24,7 @@ router.get("/all/:id", (req, res) => {
       AND User.UID = ?
       GROUP BY Picture.PID 
   ) 
-  AS max_points ORDER BY point,PID DESC `;
+  AS max_points ORDER BY point,PID  `;
   conn.query(sql, [id], (err, result) => {
     if (err) throw err;
     res.status(200).json(result);

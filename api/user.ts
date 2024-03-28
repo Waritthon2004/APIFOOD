@@ -256,6 +256,8 @@ router.put("/:id", fileupload.diskLoader.single("file"),async (req, res) => {
 
 });
 
-// router.put('',(req,res)=>{
-//   let sql = "";
-// })
+router.put('password/:id',(req,res)=>{
+  let user = req.body;
+  console.log("hi",req.body);
+
+})
