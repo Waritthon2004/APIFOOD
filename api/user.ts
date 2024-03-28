@@ -256,8 +256,36 @@ router.put("/:id", fileupload.diskLoader.single("file"),async (req, res) => {
 
 });
 
-router.put('password/:id',(req,res)=>{
+ router.put('/password/:id',async (req,res)=>{
+  const id = req.params.id;
   let user = req.body;
-  console.log("hi",req.body);
-
+  console.log(req.body);
+  
+  const newpass= await hashPassword(user.Newpass); 
+  let sql = "SELECT Password FROM User WHERE UID = ?";
+  sql = mysql.format(sql, [id]);
+  conn.query(sql, (err, result) => {
+      if (err) throw err;
+      if (result && result.length > 0) {
+          if (comparePassword(user.Password, result[0].Password)) {
+            sql =
+            "UPDATE `User` SET Password = ?   WHERE `UID` = ?" ;
+            sql = mysql.format(sql, [
+            newpass ,
+            id
+          ]);
+          conn.query(sql, (err, result) => {
+            if (err) throw err;
+            res.status(201).json({
+              affected_row: result.affectedRows,
+              last_idx: result.insertId,
+            });
+          });
+          } else {
+              res.json({ TXT: "False" });
+          }
+      } 
+  });
+ 
+   
 })
