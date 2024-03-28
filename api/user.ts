@@ -195,8 +195,10 @@ router.put("/:id", fileupload.diskLoader.single("file"),async (req, res) => {
   const id = req.params.id;
   
   let user = req.body;
-  console.log(user.Firstname);
-
+  console.log("hi",req.body);
+  
+ 
+  
   try {
      //Upload to firebase storage
   const filename = Math.round(Math.random() * 1000)+".png";
@@ -210,6 +212,8 @@ router.put("/:id", fileupload.diskLoader.single("file"),async (req, res) => {
   const url = await getDownloadURL(snapshost.ref)
     // const password = user.Password;
     // user.Password = await hashPassword(password); 
+    console.log('url:',url);
+    
     let sql =
       "UPDATE `User` SET `Firstname` = ?, `Lastname` = ?,  `Email` = ? ,  `image` = ?  WHERE `UID` = ?" ;
     sql = mysql.format(sql, [
@@ -231,7 +235,22 @@ router.put("/:id", fileupload.diskLoader.single("file"),async (req, res) => {
 
    
   } catch (error) {
-    res.status(500).json(error);
+    let sql =
+    "UPDATE `User` SET `Firstname` = ?, `Lastname` = ?,  `Email` = ?   WHERE `UID` = ?" ;
+  sql = mysql.format(sql, [
+    user.Firstname,
+    user.Lastname,
+    user.Email,
+    id
+  ]);
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+    res.status(201).json({
+      affected_row: result.affectedRows,
+      last_idx: result.insertId,
+    });
+  });
+ 
   }
  
 
