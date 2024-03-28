@@ -10,7 +10,7 @@ export const app = express();
 
 app.use(
     cors({
-      origin: "*",
+      origin: "https://tastofood-6fc52.web.app",
     })
   );
 //check body ก่อนเรียก path api
