@@ -24,7 +24,7 @@ router.get("/all/:id", (req, res) => {
       AND User.UID = ?
       GROUP BY Picture.PID 
   ) 
-  AS max_points ORDER BY point,PID  `;
+  AS max_points ORDER BY point,PID `;
   conn.query(sql, [id], (err, result) => {
     if (err) throw err;
     res.status(200).json(result);
@@ -82,33 +82,35 @@ router.get("/all/:id", (req, res) => {
 //     });
 // });
 router.post("/", async (req, res) => {
+ 
+  
   let data = req.body;
 
   let sql = "DELETE FROM Delay WHERE TIMESTAMPDIFF(SECOND, Time, NOW()) >= ?";
   sql = mysql.format(sql, [data]);
   conn.query(sql, async (err, result) => {
     if (err) throw err;
-
-
-  });
-  let check1: any = await new Promise((resolve, reject) => {
-    conn.query("SELECT Picture.PID as PID, Picture.url as url, Statics.point as point  FROM Picture, Statics WHERE Picture.PID = Statics.PID AND DATEDIFF(CURDATE(), Date) = 0  AND Picture.PID NOT IN (SELECT PID FROM Delay)  ORDER BY RAND()  LIMIT 2 ", (err, result) => {
-      if (err) reject(err);
-      resolve(result);
+    let check1: any = await new Promise((resolve, reject) => {
+      conn.query("SELECT Picture.PID as PID, Picture.url as url, Statics.point as point  FROM Picture, Statics WHERE Picture.PID = Statics.PID AND DATEDIFF(CURDATE(), Date) = 0  AND Picture.PID NOT IN (SELECT PID FROM Delay)  ORDER BY RAND()  LIMIT 2 ", (err, result) => {
+        if (err) reject(err);
+        resolve(result);
+      });
     });
-  });
-
-  console.log(check1);
   
-  res.status(200).json({
-    pid1: check1[0].PID,
-    image1: check1[0].url,
-    point1: check1[0].point,
+    console.log(check1);
     
-    image2: check1[1].url,
-    point2: check1[1].point,
-    pid2: check1[1].PID,
+    res.status(200).json({
+      pid1: check1[0].PID,
+      image1: check1[0].url,
+      point1: check1[0].point,
+      
+      image2: check1[1].url,
+      point2: check1[1].point,
+      pid2: check1[1].PID,
+    });
+
   });
+  
 });
 
 
