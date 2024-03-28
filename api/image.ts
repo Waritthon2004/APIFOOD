@@ -104,7 +104,7 @@ router.post("/", async (req, res) => {
     pid1: check1[0].PID,
     image1: check1[0].url,
     point1: check1[0].point,
-
+    
     image2: check1[1].url,
     point2: check1[1].point,
     pid2: check1[1].PID,
