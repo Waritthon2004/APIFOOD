@@ -88,6 +88,55 @@ router.post("/",fileupload.diskLoader.single("file"),async(req,res)=>{
 });
 
 
+
+router.put("/",fileupload.diskLoader.single("file"),async(req,res)=>{
+    const id = req.query.id;
+    const pid = req.query.PID;
+  
+    
+try {
+   //Upload to firebase storage
+   const filename = Math.round(Math.random() * 1000)+".png";
+   // Define locations to be saved on storag
+   const storageRef = ref(storage,"/images/"+filename);
+   // define file detail
+   const metaData = {contentType : req.file!.mimetype};
+   // Start upload
+   const snapshost = await uploadBytesResumable(storageRef,req.file!.buffer, metaData);
+   //Get url image from storage
+   const url = await getDownloadURL(snapshost.ref);
+   let sql ="DELETE FROM Picture WHERE PID = ?";
+   sql = mysql.format(sql, [pid]);
+
+   conn.query(sql, async (err, result) => {
+     if (err) throw err;
+
+     const currentDate =  getCurrentDate();
+     let check1: any = await new Promise((resolve, reject) => {
+       conn.query("INSERT INTO `Picture`(`PID`, `url`, `UID`) VALUES (?,?,?)",[pid, url,id], (err, result) => {
+         if (err) reject(err);
+         resolve(result);
+       });
+     });
+  
+     let check2: any = await new Promise((resolve, reject) => {
+       conn.query("INSERT INTO `Statics`(`PID`, `Date`, `point`) VALUES (?,?,?)",[pid, currentDate,0], (err, result) => {
+         if (err) reject(err);
+         resolve(result);
+       });
+     });
+
+   });
+ 
+
+
+
+} catch (error) {
+  
+}
+   
+  
+});
 function getCurrentDate(): string {
   const date = new Date();
   const timeZoneOffset = date.getTimezoneOffset() / 60;
