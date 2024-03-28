@@ -34,6 +34,7 @@ router.get("/all/:id", (req, res) => {
 
 router.post("/", async (req, res) => {
  
+  console.log("SS");
   
   let data = req.body;
 
@@ -49,20 +50,23 @@ router.post("/", async (req, res) => {
     });
   
     console.log(check1);
+    if (check1.length >= 2) {
+      res.status(200).json({
+        name1: check1[0].Name,
+        user1: check1[0].User,
+        pid1: check1[0].PID,
+        image1: check1[0].url,
+        point1: check1[0].point,
+        name2: check1[1].Name,
+        user2: check1[1].User,
+        image2: check1[1].url,
+        point2: check1[1].point,
+        pid2: check1[1].PID,
+      });
+    } else {
+      res.status(200).json({ });
+    }
     
-    res.status(200).json({
-      name1 :check1[0].Name,
-      user1 :check1[0].User,
-      pid1: check1[0].PID,
-      image1: check1[0].url,
-      point1: check1[0].point,
-
-      name2 :check1[1].Name,
-      user2 :check1[1].User,
-      image2: check1[1].url,
-      point2: check1[1].point,
-      pid2: check1[1].PID,
-    });
 
   });
   
