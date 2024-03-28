@@ -43,7 +43,7 @@ router.post("/", async (req, res) => {
   conn.query(sql, async (err, result) => {
     if (err) throw err;
     let check1: any = await new Promise((resolve, reject) => {
-      conn.query("SELECT Picture.PID as PID, Picture.url as url, Statics.point as point ,User.image as User ,User.Firstname as Name  FROM Picture, Statics,User WHERE Picture.PID = Statics.PID AND Picture.UID = User.UID AND DATEDIFF(CURDATE(), Date) = 0  AND Picture.PID NOT IN (SELECT PID FROM Delay)  ORDER BY RAND()  LIMIT 2 ", (err, result) => {
+      conn.query("SELECT Picture.PID as PID, Picture.url as url, Statics.point as point ,User.image as User ,User.Firstname as Name ,User.UID as UID  FROM Picture, Statics,User WHERE Picture.PID = Statics.PID AND Picture.UID = User.UID AND DATEDIFF(CURDATE(), Date) = 0  AND Picture.PID NOT IN (SELECT PID FROM Delay)  ORDER BY RAND()  LIMIT 2 ", (err, result) => {
         if (err) reject(err);
         resolve(result);
       }); 
@@ -52,11 +52,14 @@ router.post("/", async (req, res) => {
     console.log(check1);
     if (check1.length >= 2) {
       res.status(200).json({
+        UID1: check1[0].UID,
         name1: check1[0].Name,
         user1: check1[0].User,
         pid1: check1[0].PID,
         image1: check1[0].url,
         point1: check1[0].point,
+
+        UID2: check1[1].UID,
         name2: check1[1].Name,
         user2: check1[1].User,
         image2: check1[1].url,

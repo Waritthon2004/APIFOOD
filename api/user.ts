@@ -212,7 +212,7 @@ router.put("/:id", fileupload.diskLoader.single("file"),async (req, res) => {
   const url = await getDownloadURL(snapshost.ref)
     // const password = user.Password;
     // user.Password = await hashPassword(password); 
-    console.log('url:',url);
+  console.log('url:',url);
     
     let sql =
       "UPDATE `User` SET `Firstname` = ?, `Lastname` = ?,  `Email` = ? ,  `image` = ?  WHERE `UID` = ?" ;
